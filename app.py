@@ -258,3 +258,13 @@ async def warmup():
     except Exception:
         # ignore warm failures; actual call will still try
         pass
+
+
+@app.post("/echo")
+async def echo(image: UploadFile):
+    return {
+        "filename": image.filename,
+        "content_type": image.content_type,
+        "size_bytes": len(await image.read())
+    }
+
