@@ -1,7 +1,7 @@
 import io, os, re, json, traceback
 from typing import List, Dict, Any, Tuple, Optional
 
-from fastapi import FastAPI, UploadFile, Form
+from fastapi import FastAPI, UploadFile, Form, File
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
@@ -17,7 +17,7 @@ from transformers import (
 # =========================
 # FastAPI setup + CORS
 # =========================
-app = FastAPI(title="Ingredient Harm Checker", version="1.1")
+app = FastAPI(title="Ingredient Harm Checker v1.1", version="1.1")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -112,7 +112,6 @@ def rules_scan(text: str) -> Dict[str, List[str]]:
 @torch.inference_mode()
 def ocr_image(pil_img: Image.Image) -> str:
     if not USE_TROCR:
-        # minimal fallback: return empty to keep pipeline alive
         return ""
     proc, mdl = get_ocr()
     pixel_values = proc(images=pil_img, return_tensors="pt").pixel_values.to(DEVICE)
@@ -132,7 +131,6 @@ SYSTEM_PROMPT = (
 @torch.inference_mode()
 def ask_llm(ingredients_text: str, product_name: str, rules_flags: Dict[str, List[str]]) -> Dict[str, Any]:
     if not USE_LLM:
-        # rule-only fallback
         safe = not (rules_flags.get("allergens") or rules_flags.get("trans_fats"))
         return {
             "safe_overall": bool(safe),
@@ -153,10 +151,8 @@ def ask_llm(ingredients_text: str, product_name: str, rules_flags: Dict[str, Lis
     out = llm.generate(**input_ids, max_new_tokens=512, do_sample=False)
     text = tok.decode(out[0], skip_special_tokens=True)
 
-    # extract last JSON object
     m = re.search(r"\{.*\}\s*$", text, flags=re.DOTALL)
     if not m:
-        # graceful fallback
         safe = not (rules_flags.get("allergens") or rules_flags.get("trans_fats"))
         return {
             "safe_overall": bool(safe),
@@ -176,7 +172,6 @@ def ask_llm(ingredients_text: str, product_name: str, rules_flags: Dict[str, Lis
             "normalized_ingredients": [],
             "advise": "If this seems off, retake a clearer photo."
         }
-    # force findings/normalized_ingredients schema
     parsed["findings"] = rules_flags
     parsed["normalized_ingredients"] = []
     parsed.setdefault("safe_overall", True)
@@ -192,7 +187,7 @@ def health():
     return {"ok": True}
 
 @app.post("/echo")
-async def echo(image: UploadFile):
+async def echo(image: UploadFile = File(...)):
     b = await image.read()
     return {
         "filename": image.filename,
@@ -201,14 +196,13 @@ async def echo(image: UploadFile):
     }
 
 # =========================
-# Analyze
-# FIELD NAME = "image"
+# Analyze  (FIELD NAME = "image")
 # =========================
 @app.post("/analyze")
 async def analyze(
-    image: UploadFile,                          # <-- IMPORTANT: field name is 'image'
+    image: UploadFile = File(...),              # <-- must be File(...)
     product_name: str = Form(""),
-    rotate_deg: int = Form(0),                  # accepted but not exposed in UI; defaults used
+    rotate_deg: int = Form(0),
     scale_pct: int = Form(240),
 ):
     try:
@@ -218,20 +212,18 @@ async def analyze(
 
         pil = Image.open(io.BytesIO(raw)).convert("RGB")
 
-        # 1) OCR (allow empty on fallback)
+        # 1) OCR
         try:
             ocr_text = ocr_image(pil)
-        except Exception as e:
-            # keep the pipeline alive even if OCR model fails
+        except Exception:
             ocr_text = ""
-        
-        # 2) Rules layer (works even if OCR empty)
+
+        # 2) Rules
         flags = rules_scan(ocr_text)
 
-        # 3) LLM analysis (or rule-only fallback)
+        # 3) LLM (or fallback)
         analysis = ask_llm(ocr_text, product_name, flags)
 
-        # 4) Response
         return {
             "product_name": product_name or "",
             "ocr_text": ocr_text,
@@ -256,15 +248,4 @@ async def warmup():
         if USE_LLM:
             get_llm()
     except Exception:
-        # ignore warm failures; actual call will still try
         pass
-
-
-@app.post("/echo")
-async def echo(image: UploadFile):
-    return {
-        "filename": image.filename,
-        "content_type": image.content_type,
-        "size_bytes": len(await image.read())
-    }
-
