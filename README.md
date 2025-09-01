@@ -37,8 +37,8 @@ Upload a **photo of the ingredient list** and the system will scan it for potent
 
 Install Python packages:
 
-```bash
-pip install -r requirements.txt '''
+bash
+pip install -r requirements.txt
 
 ### 2. Run the API
 uvicorn app:app --reload
