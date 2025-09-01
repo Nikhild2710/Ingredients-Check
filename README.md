@@ -3,6 +3,8 @@
 This project helps you quickly check whether a cosmetic product may contain **harmful or sensitive ingredients**.  
 Upload a **photo of the ingredient list** and the system will scan it for potential concerns.
 
+**Check the tool for yourself @**: https://preview--safety-snap-scan.lovable.app/
+
 ---
 
 ## What It Does
