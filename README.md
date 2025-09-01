@@ -71,14 +71,12 @@ Example result
 - This tool highlights the main potential concerns automatically, giving you quick peace of mind.
 
 **Disclaimer**
-
 This scanner is for informational purposes only.
 It does not replace professional medical or dermatological advice.
 Always consult a qualified expert if you have concerns.
 
 **Future Ideas**
-
-Personalization basis user allergies or other health conditions
-Highlight flagged ingredients directly in the UI
-Add more region-specific ingredient restrictions
-Improve OCR on low-quality / WhatsApp-compressed images
+- Personalization basis user allergies or other health conditions
+- Highlight flagged ingredients directly in the UI
+- Add more region-specific ingredient restrictions
+- Improve OCR on low-quality / WhatsApp-compressed images
