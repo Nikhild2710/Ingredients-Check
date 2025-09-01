@@ -2,7 +2,7 @@ Cosmetics Safety Scanner — Detect Harmful Ingredients from Images
 
 This project helps you quickly check whether a cosmetic product may contain harmful or sensitive ingredients. Just upload a photo of the ingredient list and the system will scan it for potential concerns.
 
-✨ What It Does
+What It Does
 
 Upload a product image → the backend reads the text using OCR (Optical Character Recognition).
 
@@ -12,8 +12,7 @@ The detected text is checked against rules for known allergens, preservatives, U
 
 Results are returned in a clear, structured JSON format, and displayed nicely in the Lovable frontend.
 
-🏗 How It Works (in simple terms)
-
+How It Works (in simple terms)
 Frontend (Lovable)
 
 Clean interface where you upload an image.
@@ -30,7 +29,7 @@ Optional GPT: Summarizes findings into short, plain-language safety notes.
 
 Fallbacks: If AI fails or isn’t enabled, rules-only results are always provided.
 
-🚀 Getting Started
+Getting Started
 1. Install Requirements
 
 Python 3.10+
@@ -54,7 +53,7 @@ http://localhost:8000/health
 
 The Lovable app connects to this backend. Upload an image of an ingredient list and click “Analyze for Harmful Content”.
 
-📊 Example Result
+Example Result
 
 If you upload a sunscreen ingredient list, the response may look like this:
 
@@ -75,7 +74,7 @@ If you upload a sunscreen ingredient list, the response may look like this:
   }
 }
 
-🧠 Why This Matters
+Why This Matters
 
 Many people are sensitive to fragrance, preservatives, or UV filters.
 
@@ -83,11 +82,11 @@ Ingredient lists are often long and hard to parse.
 
 This tool highlights the main potential concerns automatically, giving you quick peace of mind.
 
-⚖️ Disclaimer
+Disclaimer
 
 This scanner is for informational purposes only. It does not replace professional medical or dermatological advice. Always consult a qualified expert if you have concerns.
 
-📌 Future Ideas
+Future Ideas
 
 Highlight flagged ingredients directly in the UI
 
