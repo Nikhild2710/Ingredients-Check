@@ -39,3 +39,46 @@ Install Python packages:
 
 ```bash
 pip install -r requirements.txt
+
+### 2. Run the API
+uvicorn app:app --reload
+
+### 3. Use the Lovable front end
+The Lovable app connects to this backend. Upload an image of an ingredient list and click “Analyze for Harmful Content”.
+
+Example result
+{
+  "ocr_text_corrected": "Ingredients: Water, Homosalate, Phenoxyethanol, Fragrance",
+  "rules_flags": {
+    "allergens": ["fragrance/parfum"],
+    "problematic_additives": ["PEG/PPG", "homosalate", "phenoxyethanol"]
+  },
+  "analysis": {
+    "safe_overall": true,
+    "reasons": [
+      "Includes homosalate (UV filter); restricted in some regions and may irritate sensitive skin.",
+      "Contains PEG/PPG surfactants which some users avoid.",
+      "Uses phenoxyethanol as a preservative; generally safe at low % but can irritate sensitive skin."
+    ],
+    "advise": "Review label; re-upload a clearer photo if OCR looks wrong."
+  }
+}
+
+**Why This Matters**
+
+- Many people are sensitive to fragrance, preservatives, or UV filters.
+- Ingredient lists are often long and hard to parse.
+- This tool highlights the main potential concerns automatically, giving you quick peace of mind.
+
+**Disclaimer**
+
+This scanner is for informational purposes only.
+It does not replace professional medical or dermatological advice.
+Always consult a qualified expert if you have concerns.
+
+**Future Ideas**
+
+Personalization basis user allergies or other health conditions
+Highlight flagged ingredients directly in the UI
+Add more region-specific ingredient restrictions
+Improve OCR on low-quality / WhatsApp-compressed images
